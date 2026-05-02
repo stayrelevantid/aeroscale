@@ -213,43 +213,25 @@
 ### Tasks
 
 - [ ] **6.1 — Terraform Destroy**
-  - Jalankan `terraform plan -destroy` untuk review resource yang akan dihapus.
-  - Jalankan `terraform destroy` untuk menghapus seluruh infrastruktur.
+  - Jalankan `scripts/destroy.sh` untuk review dan destroy seluruh infrastruktur.
   - Verifikasi state file kosong / semua resource terhapus.
 
 - [ ] **6.2 — Audit Resource Idle**
-  - Cek disk yang tidak terikat:
-    ```bash
-    gcloud compute disks list --filter="users:-"
-    ```
-  - Cek forwarding rules (Load Balancer) yang masih aktif:
-    ```bash
-    gcloud compute forwarding-rules list
-    ```
-  - Cek static IP yang tidak digunakan:
-    ```bash
-    gcloud compute addresses list --filter="status!=RESERVED"
-    ```
+  - Jalankan `scripts/audit.sh` untuk cek unattached disks, forwarding rules, static IPs, dll.
 
 - [ ] **6.3 — Cleanup GCS Backend (Opsional)**
-  - Hapus bucket GCS state jika proyek sudah sepenuhnya selesai.
+  - Termasuk di `scripts/cleanup.sh` — hapus GCS bucket jika proyek selesai.
   - Atau biarkan untuk referensi di masa depan.
 
 - [ ] **6.4 — Cleanup Artifact Registry**
-  - Hapus image container yang sudah tidak diperlukan dari Artifact Registry.
-  - Atau hapus repository jika sudah tidak digunakan.
+  - Termasuk di `scripts/cleanup.sh` — hapus images dan/atau repository.
 
 - [ ] **6.5 — Final Billing Audit**
-  - Buka GCP Billing Console.
-  - Verifikasi tidak ada charge berjalan dari resource proyek ini.
+  - Jalankan `scripts/billing-audit.sh` untuk cek billing accounts, enabled APIs, dan usage.
   - Set billing alert jika belum ada sebagai safety net.
 
 - [ ] **6.6 — Dokumentasi Post-Mortem**
-  - Tulis retrospektif di `RETROSPECTIVE.md`:
-    - Apa yang berjalan lancar.
-    - Tantangan yang dihadapi.
-    - Lesson learned.
-    - Rekomendasi improvement untuk iterasi berikutnya.
+  - Template sudah dibuat di `RETROSPECTIVE.md` — lengkapi setelah stress test & cleanup.
 
 ---
 

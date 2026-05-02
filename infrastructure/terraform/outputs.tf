@@ -47,3 +47,13 @@ output "ksa_name" {
   value       = "aeroscale-worker-sa"
   description = "Kubernetes Service Account Name"
 }
+
+output "artifact_registry_repo" {
+  value       = google_artifact_registry_repository.aeroscale_docker.name
+  description = "Artifact Registry Repository Name"
+}
+
+output "artifact_registry_url" {
+  value       = "${var.region}-docker.pkg.dev/${var.project_id}/aeroscale-docker"
+  description = "Artifact Registry Docker Repository URL"
+}

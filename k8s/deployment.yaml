@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aeroscale-worker
+  namespace: aeroscale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aeroscale-worker
+  template:
+    metadata:
+      labels:
+        app: aeroscale-worker
+    spec:
+      serviceAccountName: aeroscale-worker-sa
+      containers:
+        - name: worker
+          image: asia-southeast1-docker.pkg.dev/stayrelevantid/aeroscale-docker/aeroscale-worker:latest
+          ports:
+            - containerPort: 8080
+              name: healthz
+          env:
+            - name: PROJECT_ID
+              value: "stayrelevantid"
+            - name: PUBSUB_SUBSCRIPTION_ID
+              value: "aeroscale-event-subscription"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

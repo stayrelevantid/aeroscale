@@ -3,3 +3,13 @@
 *.tfstate.backup
 *.tfvars
 .terraform.lock.hcl
+tfplan
+
+# Go build output
+/publisher
+/worker
+
+# IDE
+.idea/
+.vscode/
+*.swp

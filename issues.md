@@ -90,31 +90,31 @@
 
 ### Tasks
 
-- [ ] **3.1 — Setup Aplikasi Worker Golang**
+- [x] **3.1 — Setup Aplikasi Worker Golang**
   - Inisialisasi Go module (`go mod init`).
   - Buat worker sederhana yang subscribe ke Pub/Sub dan memproses pesan.
   - Tambahkan health check endpoint (HTTP `/healthz`).
   - Tulis unit test dasar untuk logika processing.
 
-- [ ] **3.2 — Buat Dockerfile**
+- [x] **3.2 — Buat Dockerfile**
   - Buat multi-stage Dockerfile untuk build worker Golang.
   - Stage 1: Build binary dengan `golang:1.22-alpine`.
   - Stage 2: Runtime minimal dengan `alpine:3.19` atau `distroless`.
   - Pastikan binary berjalan sebagai non-root user.
   - Test build lokal: `docker build -t aeroscale-worker .`
 
-- [ ] **3.3 — Setup Google Artifact Registry**
+- [x] **3.3 — Setup Google Artifact Registry**
   - Buat repository di Artifact Registry via Terraform atau manual.
   - Konfigurasi Docker authentication ke Artifact Registry.
   - Test push image secara manual untuk validasi akses.
 
-- [ ] **3.4 — Buat Kubernetes Manifests**
+- [x] **3.4 — Buat Kubernetes Manifests**
   - Buat `Deployment` manifest untuk worker pod.
   - Buat `ServiceAccount` manifest (KSA) dengan annotation Workload Identity.
   - Buat `Namespace` manifest (jika menggunakan namespace terpisah).
   - Validasi manifest dengan `kubectl apply --dry-run=client`.
 
-- [ ] **3.5 — Setup CI/CD Pipeline (GitHub Actions)**
+- [x] **3.5 — Setup CI/CD Pipeline (GitHub Actions)**
   - Buat workflow file `.github/workflows/deploy.yml`.
   - Step 1: Checkout code.
   - Step 2: Authenticate ke GCP via Workload Identity Federation atau Service Account Key.
@@ -132,18 +132,18 @@
 
 ### Tasks
 
-- [ ] **4.1 — Install KEDA via Helm (Terraform)**
+- [x] **4.1 — Install KEDA via Helm (Terraform)**
   - Tambahkan Helm provider di Terraform.
   - Definisikan `helm_release` resource untuk KEDA operator.
   - Set namespace: `keda` (buat jika belum ada).
   - Jalankan `terraform apply` untuk install KEDA.
   - Verifikasi KEDA pods running: `kubectl get pods -n keda`.
 
-- [ ] **4.2 — Buat TriggerAuthentication Manifest**
+- [x] **4.2 — Buat TriggerAuthentication Manifest**
   - Buat `TriggerAuthentication` resource yang mereferensikan credential Workload Identity.
   - Pastikan KSA yang digunakan sudah ter-binding ke GSA dengan role Pub/Sub.
 
-- [ ] **4.3 — Buat ScaledObject Manifest**
+- [x] **4.3 — Buat ScaledObject Manifest**
   - Definisikan `ScaledObject` yang menarget Deployment worker.
   - Konfigurasi trigger:
     - Type: `gcp-pubsub`.
@@ -154,7 +154,7 @@
     - `maxReplicaCount`: `10`.
   - Set `cooldownPeriod` dan `pollingInterval` yang sesuai.
 
-- [ ] **4.4 — Deploy & Validasi KEDA**
+- [x] **4.4 — Deploy & Validasi KEDA**
   - Apply manifest `TriggerAuthentication` dan `ScaledObject` ke cluster.
   - Verifikasi ScaledObject aktif: `kubectl get scaledobject`.
   - Verifikasi HPA terbuat otomatis: `kubectl get hpa`.
@@ -259,7 +259,7 @@
 | :--- | :-------------------- | :----- |
 | 1    | Setup Lokal & Backend | ✅     |
 | 2    | Infrastructure Build  | ✅     |
-| 3    | CI/CD Aplikasi        | ⬜     |
-| 4    | KEDA Integration      | ⬜     |
+| 3    | CI/CD Aplikasi        | ✅     |
+| 4    | KEDA Integration      | ✅     |
 | 5    | Validasi Komprehensif | ⬜     |
 | 6    | Clean-Up & Audit      | ⬜     |

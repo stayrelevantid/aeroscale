@@ -49,8 +49,11 @@ gcloud auth application-default login
 gcloud config set project stayrelevantid
 ```
 
-**GitHub Actions Secret:**
-- `GCP_SA_KEY` — JSON key of a Service Account with roles: `roles/artifactregistry.writer`, `roles/container.admin`, `roles/pubsub.subscriber`
+**GitHub Actions Secrets (Workload Identity Federation):**
+- `WIF_PROVIDER` — Full WIF provider name: `projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/aeroscale-github/providers/aeroscale-github-provider`
+- `GCP_SERVICE_ACCOUNT` — Service account email: `aeroscale-worker@stayrelevantid.iam.gserviceaccount.com`
+
+> **Note:** WIF uses short-lived OIDC tokens from GitHub — no long-lived JSON keys needed.
 
 ## Quick Start
 
@@ -66,7 +69,7 @@ terraform apply -auto-approve
 
 # 3. Get GKE credentials
 gcloud container clusters get-credentials aeroscale-gke \
-  --zone=asia-southeast1-a --project=stayrelevantid
+  --region=asia-southeast1 --project=stayrelevantid
 
 # 4. Install KEDA
 helm install keda kedacore/keda --namespace keda --version 2.13.2
@@ -106,6 +109,7 @@ aeroscale/
 │   ├── pubsub.tf                   # Pub/Sub topic + subscription
 │   ├── iam.tf                      # GSA, Workload Identity, Pub/Sub role
 │   ├── artifact_registry.tf        # Docker Artifact Registry repository
+│   ├── wif.tf                     # Workload Identity Federation for GitHub Actions
 │   └── keda.tf                     # KEDA Helm release + namespace
 ├── k8s/
 │   ├── namespace.yaml              # Namespace: aeroscale
@@ -139,10 +143,11 @@ aeroscale/
 | `variables.tf` | `project_id`, `region`, `zone` | Input variables with defaults: `stayrelevantid`, `asia-southeast1`, `asia-southeast1-a` |
 | `outputs.tf` | Cluster endpoint, topic, SA email, etc. | Outputs for reference after `terraform apply` |
 | `vpc.tf` | VPC, Subnet, Firewall, Router, NAT | Custom VPC (`10.0.0.0/20`) with Private Google Access, secondary ranges for pods/services, Cloud NAT for private node egress |
-| `gke.tf` | GKE Cluster, Node Pool | Private zonal cluster with Workload Identity, e2-medium nodes, autoscaling 1-3 |
+| `gke.tf` | GKE Cluster, Node Pool | **Regional** private cluster with Workload Identity, e2-medium nodes, autoscaling 1-3, `remove_default_node_pool = true` |
 | `pubsub.tf` | Topic, Subscription | `aeroscale-event-queue` topic with subscription (60s ack deadline, 7d retention, retry policy) |
 | `iam.tf` | GSA, IAM role, WI binding | `aeroscale-worker` GSA with `roles/pubsub.subscriber`, Workload Identity binding to KSA `aeroscale/aeroscale-worker-sa` |
 | `artifact_registry.tf` | Docker repository | `aeroscale-docker` in `asia-southeast1` |
+| `wif.tf` | WIF Pool, Provider, IAM bindings | Workload Identity Federation for GitHub Actions — OIDC pool `aeroscale-github`, provider with `attribute.repository` mapping, additional roles `artifactregistry.writer` and `container.admin` for GSA |
 | `keda.tf` | K8s namespace, Helm release | KEDA operator v2.13.2 installed via Helm to namespace `keda` |
 
 ### Application (Go)
@@ -186,7 +191,7 @@ Multi-stage `Dockerfile`:
 **`.github/workflows/deploy.yml`** triggers on push to `main` when paths change (`cmd/**`, `internal/**`, `Dockerfile`, `go.*`, `k8s/**`):
 
 1. Checkout code
-2. Authenticate to GCP via `GCP_SA_KEY` secret
+2. Authenticate to GCP via **Workload Identity Federation** (OIDC token exchange — no JSON keys)
 3. Build Docker image tagged with commit SHA + `latest`
 4. Push to Artifact Registry
 5. Get GKE credentials
@@ -246,7 +251,7 @@ helm install keda kedacore/keda --namespace keda --version 2.13.2
 
 # 3. Get new GKE credentials
 gcloud container clusters get-credentials aeroscale-gke \
-  --zone=asia-southeast1-a --project=stayrelevantid
+  --region=asia-southeast1 --project=stayrelevantid
 
 # 4. Re-deploy worker
 cd ../..

@@ -2,7 +2,7 @@ data "google_client_config" "default" {}
 
 data "google_container_cluster" "aeroscale_gke" {
   name     = google_container_cluster.aeroscale_gke.name
-  location = var.zone
+  location = var.region
 }
 
 terraform {

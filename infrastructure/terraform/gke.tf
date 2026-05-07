@@ -1,6 +1,6 @@
 resource "google_container_cluster" "aeroscale_gke" {
   name     = "aeroscale-gke"
-  location = var.zone
+  location = var.region
 
   network    = google_compute_network.aeroscale_vpc.id
   subnetwork = google_compute_subnetwork.aeroscale_subnet.id
@@ -22,7 +22,8 @@ resource "google_container_cluster" "aeroscale_gke" {
 
   deletion_protection = false
 
-  initial_node_count = 1
+  remove_default_node_pool = true
+  initial_node_count       = 1
 
   node_config {
     machine_type = "e2-medium"
@@ -39,7 +40,7 @@ resource "google_container_cluster" "aeroscale_gke" {
 resource "google_container_node_pool" "aeroscale_nodes" {
   name     = "aeroscale-node-pool"
   cluster  = google_container_cluster.aeroscale_gke.name
-  location = var.zone
+  location = var.region
 
   autoscaling {
     min_node_count = 1

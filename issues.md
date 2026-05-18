@@ -168,41 +168,28 @@
 
 ### Tasks
 
-- [ ] **5.1 — Buat Script Publisher (Stress Test Tool)**
-  - Buat script Go/Python untuk publish 500 pesan ke Pub/Sub topic.
-  - Tambahkan opsi konfigurasi: jumlah pesan, batch size, delay antar pesan.
-  - Test publish beberapa pesan kecil terlebih dahulu untuk validasi koneksi.
+- [x] **5.1 — Buat Script Publisher (Stress Test Tool)**
+  - Go publisher (`cmd/publisher/main.go`) with flags: `--count`, `--batch`, `--delay`
+  - Tested with 500, 2000, 3000, and 5000 messages — all 0 failures
 
-- [ ] **5.2 — Eksekusi Stress Test**
-  - Publish 500 pesan ke topic.
-  - Pantau proses scaling pod secara real-time:
-    ```bash
-    kubectl get pods -w
-    kubectl get hpa -w
-    ```
-  - Catat timeline scaling: berapa lama dari publish → scale-up → scale-down.
+- [x] **5.2 — Eksekusi Stress Test**
+  - 500 msgs: 0 failures, pods scaled 1→4→1
+  - 2,000 msgs: 0 failures, pods scaled 1→8→1
+  - 5,000 msgs: 0 failures, pods scaled 1→10→1 (peak)
 
-- [ ] **5.3 — Analisis HPA & Autoscaling Behavior**
-  - Verifikasi pod naik mendekati batas (max 10) saat beban tinggi.
-  - Verifikasi pod turun ke minimum (1) setelah antrian kosong.
-  - Cek `kubectl describe hpa` untuk melihat metric dan keputusan scaling.
-  - Dokumentasikan hasil:
-    - Jumlah pod peak.
-    - Waktu scale-up.
-    - Waktu scale-down (cooldown).
+- [x] **5.3 — Analisis HPA & Autoscaling Behavior**
+  - Confirmed pods scale up to max (10) under high load
+  - Confirmed pods scale down to min (1) after queue drains
+  - KEDA polls every 10s, 60s cooldown before scale-down
+  - Peak: 2,400/50 average (48x threshold) → 10 pods
 
-- [ ] **5.4 — Monitoring & Logging**
-  - Pastikan log worker terbaca via `kubectl logs`.
-  - (Opsional) Setup Cloud Logging / Cloud Monitoring dashboard.
-  - (Opsional) Cek metric Pub/Sub (unacked messages) via GCP Console.
-  - Screenshot/export hasil monitoring sebagai bukti validasi.
+- [x] **5.4 — Monitoring & Logging**
+  - Worker logs visible via `kubectl logs`
+  - Pub/Sub metrics confirmed via `kubectl describe hpa`
+  - Scaling timeline fully documented
 
-- [ ] **5.5 — Dokumentasi Hasil Validasi**
-  - Buat dokumen `VALIDATION_REPORT.md` berisi:
-    - Setup yang digunakan.
-    - Hasil stress test (angka, timeline, screenshot).
-    - Temuan / anomali jika ada.
-    - Kesimpulan apakah autoscaling berjalan sesuai PRD.
+- [x] **5.5 — Dokumentasi Hasil Validasi**
+  - See [VALIDATION_REPORT.md](./VALIDATION_REPORT.md) for full test results, timeline, and conclusions
 
 ---
 

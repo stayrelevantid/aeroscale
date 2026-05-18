@@ -275,6 +275,17 @@ kubectl get pods -n aeroscale -w
 kubectl get hpa -n aeroscale -w
 ```
 
+### Validation Results (Fase 5)
+
+Full results documented in [VALIDATION_REPORT.md](./VALIDATION_REPORT.md).
+
+| Test | Messages | 0 Failures | Peak Pods |
+|---|---|---|---|
+| 1 | 500 | Yes | ~4 |
+| 2 | 2,000 | Yes | ~8 |
+| 3 | 3,000 | Yes | ~9 |
+| 4 | 5,000 | Yes | 10 (max) |
+
 ## Cost Optimization Notes
 
 - GKE cluster uses `e2-medium` (2 vCPU, 4GB RAM) preemptible-ready machines
@@ -291,7 +302,7 @@ kubectl get hpa -n aeroscale -w
 | 2 | Infrastructure Build (Terraform Apply) | ✅ |
 | 3 | CI/CD Pipeline Aplikasi | ✅ |
 | 4 | KEDA Integration | ✅ |
-| 5 | Validasi Komprehensif (Stress Test) | ⬜ |
+| 5 | Validasi Komprehensif (Stress Test) | ✅ |
 | 6 | Clean-Up & Audit | ⬜ |
 
 See [issues.md](./issues.md) for detailed task tracker and [prd.md](./prd.md) for product requirements.

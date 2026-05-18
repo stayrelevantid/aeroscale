@@ -30,6 +30,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create subscriber: %v", err)
 	}
+
+	processDelay := os.Getenv("PROCESS_DELAY")
+	if processDelay != "" {
+		d, err := time.ParseDuration(processDelay)
+		if err != nil {
+			log.Printf("invalid PROCESS_DELAY %q, using 0", processDelay)
+		} else {
+			sub.ProcessDelay = d
+			log.Printf("process delay set to %s", d)
+		}
+	}
 	defer sub.Close()
 
 	go func() {

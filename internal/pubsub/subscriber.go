@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"time"
 
 	"cloud.google.com/go/pubsub"
 )
@@ -11,6 +12,7 @@ import (
 type Subscriber struct {
 	client         *pubsub.Client
 	subscriptionID string
+	ProcessDelay   time.Duration
 }
 
 type Message struct {
@@ -36,7 +38,10 @@ func (s *Subscriber) Close() error {
 func (s *Subscriber) Receive(ctx context.Context) error {
 	sub := s.client.Subscription(s.subscriptionID)
 
-	log.Printf("listening for messages on subscription: %s", s.subscriptionID)
+	sub.ReceiveSettings.MaxOutstandingMessages = 1
+	sub.ReceiveSettings.NumGoroutines = 1
+
+	log.Printf("listening for messages on subscription: %s (max_outstanding=%d, delay=%s)", s.subscriptionID, sub.ReceiveSettings.MaxOutstandingMessages, s.ProcessDelay)
 
 	err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		var m Message
@@ -47,6 +52,11 @@ func (s *Subscriber) Receive(ctx context.Context) error {
 		}
 
 		log.Printf("processing message: id=%s payload=%v", m.ID, m.Payload)
+
+		if s.ProcessDelay > 0 {
+			time.Sleep(s.ProcessDelay)
+		}
+
 		msg.Ack()
 		log.Printf("message processed: id=%s", m.ID)
 	})

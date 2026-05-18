@@ -25,6 +25,8 @@ spec:
               value: "stayrelevantid"
             - name: PUBSUB_SUBSCRIPTION_ID
               value: "aeroscale-event-subscription"
+            - name: PROCESS_DELAY
+              value: "3s"
           livenessProbe:
             httpGet:
               path: /healthz

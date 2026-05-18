@@ -54,6 +54,18 @@
 - Helm chart versioning harus diverifikasi kompatibel dengan Kubernetes API version yang digunakan.
 - Organization policy restrictions harus diantisipasi sejak awal planning.
 - Import resource yang dibuat manual (Artifact Registry, Helm release) ke Terraform state untuk konsistensi.
+- Terraform destroy KEDA Helm release bisa timeout — perlu `terraform state rm` manual jika cluster sudah tidak bisa diakses.
+- GCS state bucket harus dibersihkan manual setelah `terraform destroy` karena tidak dikelola Terraform.
+
+---
+
+## Clean-Up (Fase 6) — Hasil
+
+- **Terraform Destroy**: Berhasil menghapus semua resource (GKE cluster ~5 menit, VPC, Subnet, Pub/Sub, SA, IAM, WIF, Cloud NAT/Router, Firewall, Artifact Registry).
+- **KEDA removal**: Helm release timeout saat destroy — perlu `terraform state rm` untuk `helm_release.keda` dan `kubernetes_namespace.keda` karena GKE cluster sudah tidak bisa diakses.
+- **GCS bucket**: `aeroscale-tf-state` (85 objects) dihapus manual via `gsutil rm -r`.
+- **Billing audit**: 0 compute instances, 0 disks, 0 GKE clusters. APIs masih aktif tapi tidak dikenakan biaya.
+- **Artifact Registry** dan **Pub/Sub**: Terhapus otomatis bareng `terraform destroy`.
 
 ---
 
